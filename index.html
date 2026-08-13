@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>S2 Launch — Feedback Collection</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  <div class="bg-grid"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="brand-icon">S2</div>
+      <div class="brand-text">
+        <span class="brand-title">Launch Feedback</span>
+        <span class="brand-sub">Event Collection Tool</span>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="#" class="nav-link active" data-view="form">Feedback Form</a>
+      <a href="#" class="nav-link" data-view="dashboard">Dashboard</a>
+      <a href="#" class="nav-link" data-view="admin">Admin</a>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <!-- ═══ FEEDBACK FORM VIEW ═══ -->
+    <section id="view-form" class="view active">
+      <div class="form-hero">
+        <div class="hero-badge">Participant Feedback</div>
+        <h1 id="form-event-title">S2 Launch Event</h1>
+        <p id="form-event-desc">Share your experience with us</p>
+      </div>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <span class="progress-text" id="progress-text">Section 1 of 1</span>
+      </div>
+
+      <div class="form-card" id="form-sections">
+        <!-- Dynamically rendered -->
+      </div>
+    </section>
+
+    <!-- ═══ SUCCESS VIEW ═══ -->
+    <section id="view-success" class="view">
+      <div class="success-card">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <h2>Thank You!</h2>
+        <p>Your feedback has been recorded successfully. We appreciate you taking the time to share your experience at the S2 Launch Event.</p>
+        <button class="btn btn-primary btn-glow" id="btn-new-response">Submit Another Response</button>
+      </div>
+    </section>
+
+    <!-- ═══ DASHBOARD VIEW ═══ -->
+    <section id="view-dashboard" class="view">
+      <div class="page-header">
+        <div>
+          <h1>Analytics Dashboard</h1>
+          <p>Real-time insights from participant feedback</p>
+        </div>
+        <div class="header-actions">
+          <span class="response-badge"><span id="dash-total">0</span> responses</span>
+          <button class="btn btn-ghost" id="btn-refresh-dashboard">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <div class="export-bar">
+        <span class="export-label">Export Data</span>
+        <button class="btn btn-sm" id="btn-export-csv">Responses (CSV)</button>
+        <button class="btn btn-sm" id="btn-export-json">Responses (JSON)</button>
+        <button class="btn btn-sm" id="btn-export-summary-csv">Summary (CSV)</button>
+        <button class="btn btn-sm" id="btn-export-summary-json">Summary (JSON)</button>
+      </div>
+
+      <div id="dashboard-content">
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <h3>No data yet</h3>
+          <p>Responses will appear here once participants submit feedback.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ ADMIN VIEW ═══ -->
+    <section id="view-admin" class="view">
+      <div class="page-header">
+        <div>
+          <h1>Admin Panel</h1>
+          <p>Manage feedback form templates and configuration</p>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>Upload Form Template</h3>
+          <p class="card-desc">Place your Excel file at <code>templates/feedback-form.xlsx</code> in the repo, or upload here. Embedded images and image URLs are preserved.</p>
+
+          <div class="upload-zone" id="upload-zone">
+            <div class="upload-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <p class="upload-text">Drag & drop your Excel template here</p>
+            <p class="upload-hint">or click to browse · .xlsx, .xls, .csv</p>
+            <input type="file" id="template-upload" accept=".xlsx,.xls,.csv" hidden />
+          </div>
+
+          <div class="admin-actions">
+            <button class="btn btn-ghost" id="btn-download-template">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download Sample Template
+            </button>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <h3>Current Template</h3>
+          <div id="admin-template-info">
+            <div class="empty-state small">
+              <p>No template loaded</p>
+            </div>
+          </div>
+          <div class="admin-actions" style="margin-top:1rem">
+            <button class="btn btn-primary btn-sm" id="btn-reload-repo">Reload from Repo</button>
+          </div>
+        </div>
+
+        <div class="admin-card full-width">
+          <h3>Repo File Status</h3>
+          <p class="card-desc">Checks whether your uploaded Excel and images are available in the repository.</p>
+          <div id="repo-status">
+            <div class="empty-state small"><p>Checking…</p></div>
+          </div>
+        </div>
+
+        <div class="admin-card full-width">
+          <h3>Excel Template Format</h3>
+          <p class="card-desc">Your Excel file should have a sheet named <strong>Feedback Form</strong> with these columns:</p>
+          <div class="format-table-wrap">
+            <table class="format-table">
+              <thead>
+                <tr>
+                  <th>Column</th>
+                  <th>Description</th>
+                  <th>Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>id</code></td><td>Unique question identifier</td><td>overall_rating</td></tr>
+                <tr><td><code>section</code></td><td>Section grouping</td><td>Event Experience</td></tr>
+                <tr><td><code>type</code></td><td>text, email, textarea, select, radio, checkbox, rating, scale, nps, info</td><td>rating</td></tr>
+                <tr><td><code>question</code></td><td>Question text</td><td>How would you rate the event?</td></tr>
+                <tr><td><code>options</code></td><td>Pipe-separated options (for select/radio/checkbox)</td><td>Option A|Option B</td></tr>
+                <tr><td><code>image</code></td><td>Image URL for question illustration</td><td>https://example.com/image.jpg</td></tr>
+                <tr><td><code>required</code></td><td>true or false</td><td>true</td></tr>
+                <tr><td><code>min / max</code></td><td>Range for rating, scale, nps</td><td>1 / 5</td></tr>
+                <tr><td><code>placeholder</code></td><td>Input placeholder text</td><td>Enter your name</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="card-desc" style="margin-top:1rem">Optional <strong>Meta</strong> sheet with <code>event_name</code>, <code>event_date</code>, <code>version</code>, <code>description</code> keys.</p>
+        </div>
+
+        <div class="admin-card full-width">
+          <h3>Firebase Setup</h3>
+          <p class="card-desc">Configure your Firebase credentials in <code>js/firebase-config.js</code> to enable cloud storage. Without configuration, data is stored locally in the browser.</p>
+          <ol class="setup-steps">
+            <li>Create a Firebase project at <a href="https://console.firebase.google.com" target="_blank" rel="noopener">console.firebase.google.com</a></li>
+            <li>Enable <strong>Firestore Database</strong> (start in test mode, then add security rules)</li>
+            <li>Register a Web app and copy the config values into <code>js/firebase-config.js</code></li>
+            <li>Deploy or serve this tool — responses save to <code>s2_feedback/config/responses</code></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <footer class="footer">
+    <span>S2 Launch Feedback Tool</span>
+    <span class="footer-dot">·</span>
+    <span>Powered by Firebase</span>
+  </footer>
+
+  <script type="module" src="js/app.js?v=3"></script>
+</body>
+</html>

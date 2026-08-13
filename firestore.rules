@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // S2 Feedback Tool collections
+    match /s2_feedback/{document=**} {
+      // Allow read/write for development — tighten for production
+      allow read, write: if true;
+    }
+  }
+}
