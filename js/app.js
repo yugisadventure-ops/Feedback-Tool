@@ -3,7 +3,7 @@
  */
 
 import { firebaseConfig, COLLECTIONS } from "./firebase-config.js";
-import { parseExcelFile, groupBySection } from "./form-parser.js";
+import { parseExcelFile, groupBySection, loadTemplateFromRepo } from "./form-parser.js";
 import { computeSummary, renderDashboard } from "./dashboard.js";
 import {
   exportResponsesCSV,
@@ -588,16 +588,10 @@ async function boot() {
 
   if (!formConfig) {
     try {
-      const resp = await fetch("templates/s2-launch-feedback-template.xlsx");
-      if (resp.ok) {
-        const blob = await resp.blob();
-        const file = new File([blob], "s2-launch-feedback-template.xlsx");
-        const config = await parseExcelFile(file);
-        await saveFormConfig(config);
-        formConfig = config;
-      }
+      formConfig = await loadTemplateFromRepo();
+      if (formConfig) await saveFormConfig(formConfig);
     } catch (e) {
-      console.warn("Could not auto-load default template:", e);
+      console.warn("Could not auto-load template from repo:", e);
     }
   }
 

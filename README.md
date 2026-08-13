@@ -47,7 +47,13 @@ export const firebaseConfig = {
 
 ### 3. Upload your Excel template
 
-Go to **Admin → Upload Form Template** and upload your Excel file, or use the included sample at `templates/s2-launch-feedback-template.xlsx`.
+Go to **Admin → Upload Form Template** and upload your Excel file, or place it at `templates/feedback-form.xlsx` in the repo.
+
+To preprocess embedded images from your Excel:
+
+```bash
+python3 scripts/prepare-template.py path/to/your-feedback-form.xlsx
+```
 
 ## Excel Template Format
 

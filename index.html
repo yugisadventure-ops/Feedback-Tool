@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
   <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -114,7 +115,7 @@
       <div class="admin-grid">
         <div class="admin-card">
           <h3>Upload Form Template</h3>
-          <p class="card-desc">Upload an Excel (.xlsx) file to update the feedback form. Questions with images are preserved via the <code>image</code> column.</p>
+          <p class="card-desc">Place your Excel file at <code>templates/feedback-form.xlsx</code> in the repo, or upload here. Embedded images and image URLs are preserved.</p>
 
           <div class="upload-zone" id="upload-zone">
             <div class="upload-icon">
