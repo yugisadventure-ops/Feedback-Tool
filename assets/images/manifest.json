@@ -1,3 +1,8 @@
 {
-  "images": []
+  "images": [
+    "assets/images/image1.png",
+    "assets/images/image2.jpeg",
+    "assets/images/photo-zone-1.jpg",
+    "assets/images/photo-zone-2.jpg"
+  ]
 }

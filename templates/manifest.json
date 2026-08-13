@@ -1,8 +1,9 @@
 {
+  "preferred": "S2_Launch_Event_Feedback_Form.xlsx",
   "templates": [
+    "S2_Launch_Event_Feedback_Form.xlsx",
+    "templates/S2_Launch_Event_Feedback_Form.xlsx",
     "templates/feedback-form.xlsx",
-    "templates/S2-Launch-Feedback.xlsx",
     "templates/s2-launch-feedback-template.xlsx"
-  ],
-  "preferred": "templates/feedback-form.xlsx"
+  ]
 }

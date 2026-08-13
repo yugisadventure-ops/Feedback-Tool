@@ -475,11 +475,13 @@ async function handleTemplateUpload(file) {
 
 // ─── Repo Asset Check ────────────────────────────────────────────────────────
 const REPO_PATHS_TO_CHECK = [
+  "S2_Launch_Event_Feedback_Form.xlsx",
+  "templates/S2_Launch_Event_Feedback_Form.xlsx",
   "templates/feedback-form.xlsx",
-  "templates/S2-Launch-Feedback.xlsx",
-  "feedback-form.xlsx",
   "templates/s2-launch-feedback-template.xlsx",
   "assets/images/manifest.json",
+  "assets/images/photo-zone-1.jpg",
+  "assets/images/photo-zone-2.jpg",
 ];
 
 const IMAGE_PATHS_TO_CHECK = async () => {
@@ -697,16 +699,20 @@ async function boot() {
     showView("form");
   });
 
-  // Load config
-  formConfig = await loadFormConfig();
+  // Load config — repo template is source of truth when available
+  let storedConfig = await loadFormConfig();
 
-  if (!formConfig) {
-    try {
-      formConfig = await loadTemplateFromRepo();
-      if (formConfig) await saveFormConfig(formConfig);
-    } catch (e) {
-      console.warn("Could not auto-load template from repo:", e);
+  try {
+    const repoConfig = await loadTemplateFromRepo();
+    if (repoConfig) {
+      formConfig = repoConfig;
+      await saveFormConfig(repoConfig);
+    } else {
+      formConfig = storedConfig;
     }
+  } catch (e) {
+    console.warn("Could not auto-load template from repo:", e);
+    formConfig = storedConfig;
   }
 
   if (formConfig) {

@@ -128,24 +128,12 @@ export async function resolveImagePath(imageRef, baseUrl = "") {
 
   for (const path of candidates) {
     try {
-      const resp = await fetch(`${baseUrl}${path}`);
-      if (resp.ok) {
-        const blob = await resp.blob();
-        return await blobToDataUrl(blob);
-      }
+      const resp = await fetch(`${baseUrl}${path}`, { method: "HEAD" });
+      if (resp.ok) return path;
     } catch {
       /* try next */
     }
   }
 
-  return ref;
-}
-
-function blobToDataUrl(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
+  return normalized;
 }
