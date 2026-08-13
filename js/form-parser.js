@@ -199,6 +199,8 @@ export async function fetchTemplatePaths() {
   paths.push(
     "templates/feedback-form.xlsx",
     "templates/S2-Launch-Feedback.xlsx",
+    "feedback-form.xlsx",
+    "S2-Launch-Feedback.xlsx",
     "templates/s2-launch-feedback-template.xlsx",
   );
 

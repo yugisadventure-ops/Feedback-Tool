@@ -119,8 +119,11 @@ export async function resolveImagePath(imageRef, baseUrl = "") {
   const candidates = [
     normalized,
     `assets/images/${normalized}`,
+    `photos/${normalized}`,
+    `images/${normalized}`,
     `assets/${normalized}`,
     `templates/${normalized}`,
+    `templates/images/${normalized}`,
   ];
 
   for (const path of candidates) {
