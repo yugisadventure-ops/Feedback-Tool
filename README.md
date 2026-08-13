@@ -45,11 +45,24 @@ export const firebaseConfig = {
 
 5. Deploy Firestore rules from `firestore.rules` (or use test mode initially)
 
-### 3. Upload your Excel template
+### 3. Add your Excel + photos to the repo
 
-Go to **Admin → Upload Form Template** and upload your Excel file, or place it at `templates/feedback-form.xlsx` in the repo.
+Upload to the **`cursor/s2-feedback-tool-8a92`** branch:
 
-To preprocess embedded images from your Excel:
+| File | Path |
+|------|------|
+| Your feedback Excel | `templates/feedback-form.xlsx` |
+| Question images | `assets/images/` (e.g. `assets/images/q1.png`) |
+
+In your Excel `image` column, use the filename: `q1.png` or `assets/images/q1.png`.
+
+After adding images:
+
+```bash
+python3 scripts/build-image-manifest.py
+```
+
+Or upload via **Admin → Upload Form Template** in the app. For embedded Excel images:
 
 ```bash
 python3 scripts/prepare-template.py path/to/your-feedback-form.xlsx

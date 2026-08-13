@@ -473,7 +473,119 @@ async function handleTemplateUpload(file) {
   }
 }
 
-// ─── Dashboard ───────────────────────────────────────────────────────────────
+// ─── Repo Asset Check ────────────────────────────────────────────────────────
+const REPO_PATHS_TO_CHECK = [
+  "templates/feedback-form.xlsx",
+  "templates/S2-Launch-Feedback.xlsx",
+  "feedback-form.xlsx",
+  "templates/s2-launch-feedback-template.xlsx",
+  "assets/images/manifest.json",
+];
+
+const IMAGE_PATHS_TO_CHECK = async () => {
+  const paths = [];
+  try {
+    const resp = await fetch("assets/images/manifest.json");
+    if (resp.ok) {
+      const data = await resp.json();
+      if (Array.isArray(data.images)) paths.push(...data.images);
+    }
+  } catch { /* ignore */ }
+  return paths;
+};
+
+async function checkRepoPath(path) {
+  try {
+    const resp = await fetch(path, { method: "HEAD" });
+    return resp.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function checkRepoAssets() {
+  const results = [];
+  for (const path of REPO_PATHS_TO_CHECK) {
+    const found = await checkRepoPath(path);
+    results.push({ path, found, type: path.endsWith(".xlsx") ? "template" : "config" });
+  }
+
+  const imagePaths = await IMAGE_PATHS_TO_CHECK();
+  for (const path of imagePaths) {
+    results.push({ path, found: await checkRepoPath(path), type: "image" });
+  }
+
+  return results;
+}
+
+function renderRepoStatus(results) {
+  const el = $("#repo-status");
+  if (!el) return;
+
+  const templates = results.filter((r) => r.type === "template");
+  const images = results.filter((r) => r.type === "image");
+  const foundTemplates = templates.filter((r) => r.found);
+  const foundImages = images.filter((r) => r.found);
+
+  el.innerHTML = `
+    <div class="repo-status-grid">
+      <div class="repo-status-section">
+        <h4>Excel Templates</h4>
+        ${templates.map((r) => `
+          <div class="repo-status-row ${r.found ? "found" : "missing"}">
+            <span class="status-dot"></span>
+            <code>${escapeHtml(r.path)}</code>
+            <span>${r.found ? "Found" : "Not found"}</span>
+          </div>`).join("")}
+      </div>
+      <div class="repo-status-section">
+        <h4>Images (${foundImages.length} found)</h4>
+        ${images.length
+          ? images.map((r) => `
+            <div class="repo-status-row ${r.found ? "found" : "missing"}">
+              <span class="status-dot"></span>
+              <code>${escapeHtml(r.path)}</code>
+              <span>${r.found ? "Found" : "Not found"}</span>
+            </div>`).join("")
+          : `<p class="repo-hint">Add photos to <code>assets/images/</code> and run <code>python3 scripts/build-image-manifest.py</code></p>`}
+      </div>
+    </div>
+    <p class="repo-summary ${foundTemplates.some((t) => t.path.includes("feedback-form")) ? "ok" : "warn"}">
+      ${foundTemplates.length
+        ? `Using: <strong>${escapeHtml(foundTemplates[0].path)}</strong>`
+        : "Your custom template (<code>templates/feedback-form.xlsx</code>) was not found in the repo yet."}
+    </p>`;
+}
+
+async function reloadFromRepo() {
+  showToast("Checking repo for templates…", "info");
+  const results = await checkRepoAssets();
+  renderRepoStatus(results);
+
+  const config = await loadTemplateFromRepo();
+  if (!config) {
+    showToast("No template found in repo. Upload to templates/feedback-form.xlsx", "warning");
+    return;
+  }
+
+  config.reloadedAt = new Date().toISOString();
+  await saveFormConfig(config);
+
+  $("#admin-template-info").innerHTML = `
+    <div class="template-info-card">
+      <div class="ti-row"><span>Event</span><strong>${escapeHtml(config.meta?.eventName || "S2 Launch")}</strong></div>
+      <div class="ti-row"><span>Questions</span><strong>${config.questions.length}</strong></div>
+      <div class="ti-row"><span>Sections</span><strong>${config.sections.length}</strong></div>
+      <div class="ti-row"><span>With Images</span><strong>${config.questions.filter((q) => q.image).length}</strong></div>
+      <div class="ti-row"><span>File</span><strong>${escapeHtml(config.fileName || config.sourcePath || "Repo template")}</strong></div>
+      <div class="ti-row"><span>Reloaded</span><strong>${new Date().toLocaleString()}</strong></div>
+    </div>`;
+
+  formConfig = config;
+  renderForm();
+  showToast(`Loaded ${config.questions.length} questions from repo`, "success");
+}
+
 async function refreshDashboard() {
   responses = await loadResponses();
   const summary = computeSummary(responses, formConfig);
@@ -577,6 +689,8 @@ async function boot() {
 
   $("#btn-refresh-dashboard")?.addEventListener("click", refreshDashboard);
 
+  $("#btn-reload-repo")?.addEventListener("click", reloadFromRepo);
+
   $("#btn-new-response")?.addEventListener("click", () => {
     currentSection = 0;
     renderForm();
@@ -608,6 +722,9 @@ async function boot() {
 
   renderForm();
   responses = await loadResponses();
+
+  const repoResults = await checkRepoAssets();
+  renderRepoStatus(repoResults);
 }
 
 document.addEventListener("DOMContentLoaded", boot);
